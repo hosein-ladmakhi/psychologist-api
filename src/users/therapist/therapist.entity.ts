@@ -57,7 +57,7 @@ export class Therapist extends BaseEntity {
 
   @ManyToMany(() => Categories, (categories) => categories.therapists)
   @JoinTable()
-  workingFields: Categories;
+  workingFields: Categories[];
 
   @OneToMany(
     () => TherapistSchedules,

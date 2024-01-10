@@ -66,17 +66,17 @@ export class PatientController {
 
     const limit = +(query['limit'] || 10);
     const page = +(query['page'] || 0) * limit;
-    const data = await Patient.find({
+    const content = await Patient.find({
       order: { id: -1 },
       skip: page,
       take: limit,
       where,
     });
-    const count = await Patient.find({
+    const count = await Patient.count({
       where,
     });
 
-    return { data, count };
+    return { content, count };
   }
 
   @Patch(':id')
