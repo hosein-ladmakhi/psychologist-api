@@ -33,7 +33,10 @@ export class TherapistSchedules extends BaseEntity {
   @Column({ name: 'end_hour' })
   endHour: string;
 
-  @ManyToOne(() => Locations, (location) => location.therapistSchedules)
+  @ManyToOne(() => Locations, (location) => location.therapistSchedules, {
+    cascade: true,
+    onDelete: 'SET NULL',
+  })
   @JoinColumn()
   location: Locations;
 
