@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { TypeOrmModuleOptions, TypeOrmOptionsFactory } from '@nestjs/typeorm';
 import { Categories } from 'src/categories/categories.entity';
 import { Locations } from 'src/locations/locations.entity';
+import { Orders } from 'src/orders/orders.entity';
 import { TherapistSchedulesDayOff } from 'src/therapist-schedules-day-off/therapist-schedules-day-off.entity';
 import { TherapistSchedules } from 'src/therapist-schedules/therapist-schedules.entity';
 import { Patient } from 'src/users/patient/patient.entity';
@@ -28,6 +29,7 @@ export class DatabaseConfigService implements TypeOrmOptionsFactory {
         Locations,
         TherapistSchedules,
         TherapistSchedulesDayOff,
+        Orders,
       ],
     };
   }

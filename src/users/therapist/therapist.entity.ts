@@ -1,4 +1,5 @@
 import { Categories } from 'src/categories/categories.entity';
+import { Orders } from 'src/orders/orders.entity';
 import { TherapistSchedules } from 'src/therapist-schedules/therapist-schedules.entity';
 import {
   BaseEntity,
@@ -64,4 +65,7 @@ export class Therapist extends BaseEntity {
     (therapistSchedules) => therapistSchedules.therapist,
   )
   schedules: TherapistSchedules[];
+
+  @OneToMany(() => Orders, (order) => order.therapist)
+  patientsOrders: Orders[];
 }
