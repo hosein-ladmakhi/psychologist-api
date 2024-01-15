@@ -1,4 +1,11 @@
-import { Body, Controller, NotFoundException, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  NotFoundException,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { SaveOrderDto } from './dtos/save-order.dto';
 import { Therapist } from 'src/users/therapist/therapist.entity';
 import { Patient } from 'src/users/patient/patient.entity';
@@ -6,6 +13,7 @@ import { Locations } from 'src/locations/locations.entity';
 import { Categories } from 'src/categories/categories.entity';
 import { In } from 'typeorm';
 import { Orders } from './orders.entity';
+import { MultipleSaveOrderDto } from './dtos/multiple-save-order.dto';
 
 @Controller('orders')
 export class OrdersController {
@@ -56,5 +64,44 @@ export class OrdersController {
         type: body.type,
       }),
     );
+  }
+
+  @Post('multiple')
+  async multipleSaveOrder(@Body() body: MultipleSaveOrderDto) {
+    const responses: any[] = [];
+    for (let i = 0; i < body.items.length; i++) {
+      const response = await this.saveOrder(body.items[i]);
+      responses.push(response);
+    }
+
+    return responses;
+  }
+
+  @Get()
+  getOrders() {
+    return Orders.find();
+  }
+
+  @Get('page')
+  async getOrdersPage(@Query() query = {}) {
+    let where: Record<any, any> = {};
+
+    const limit = +(query['limit'] || 10);
+    const page = +(query['page'] || 0) * limit;
+    const content = await Orders.find({
+      order: { id: -1 },
+      skip: page,
+      take: limit,
+      where,
+      relations: {
+        therapist: true,
+        patient: true,
+      },
+    });
+    const count = await Orders.count({
+      where,
+    });
+
+    return { content, count };
   }
 }

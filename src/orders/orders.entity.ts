@@ -14,6 +14,12 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
+enum OrderStatus {
+  Done = 'Done',
+  Cancel = 'Cancel',
+  Pending = 'Pending',
+}
+
 @Entity()
 export class Orders extends BaseEntity {
   @PrimaryGeneratedColumn('rowid')
@@ -53,4 +59,7 @@ export class Orders extends BaseEntity {
 
   @Column({ name: 'end_hour' })
   endHour: string;
+
+  @Column({ name: 'status', default: OrderStatus.Pending })
+  status: OrderStatus = OrderStatus.Pending;
 }
