@@ -3,6 +3,9 @@ import {
   Controller,
   Get,
   NotFoundException,
+  Param,
+  ParseIntPipe,
+  Patch,
   Post,
   Query,
 } from '@nestjs/common';
@@ -96,6 +99,7 @@ export class OrdersController {
       relations: {
         therapist: true,
         patient: true,
+        documentation: true,
       },
     });
     const count = await Orders.count({
@@ -103,5 +107,18 @@ export class OrdersController {
     });
 
     return { content, count };
+  }
+
+  @Patch('change-status/:id')
+  async changeOrderStatus(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: any,
+  ) {
+    const order = await Orders.findOne({ where: { id } });
+    if (!order) {
+      throw new NotFoundException('order is not defined');
+    }
+    order.status = body.status;
+    return order.save();
   }
 }

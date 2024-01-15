@@ -1,6 +1,7 @@
 import { Categories } from 'src/categories/categories.entity';
 import { jsonTransformer } from 'src/core/utils/json-transformer';
 import { TherapistScheduleType } from 'src/therapist-schedules/therapist-schedules.entity';
+import { UserDocumentation } from 'src/user-documentation/user-documentation.entity';
 import { Patient } from 'src/users/patient/patient.entity';
 import { Therapist } from 'src/users/therapist/therapist.entity';
 import {
@@ -11,6 +12,7 @@ import {
   JoinTable,
   ManyToMany,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -24,6 +26,9 @@ enum OrderStatus {
 export class Orders extends BaseEntity {
   @PrimaryGeneratedColumn('rowid')
   id: number;
+
+  @OneToMany(() => UserDocumentation, (ud) => ud.order)
+  documentation: UserDocumentation[];
 
   @ManyToOne(() => Patient, (patient) => patient.orders)
   @JoinColumn()

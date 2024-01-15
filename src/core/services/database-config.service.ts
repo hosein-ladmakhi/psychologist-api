@@ -6,6 +6,7 @@ import { Locations } from 'src/locations/locations.entity';
 import { Orders } from 'src/orders/orders.entity';
 import { TherapistSchedulesDayOff } from 'src/therapist-schedules-day-off/therapist-schedules-day-off.entity';
 import { TherapistSchedules } from 'src/therapist-schedules/therapist-schedules.entity';
+import { UserDocumentation } from 'src/user-documentation/user-documentation.entity';
 import { Patient } from 'src/users/patient/patient.entity';
 import { Therapist } from 'src/users/therapist/therapist.entity';
 
@@ -30,6 +31,7 @@ export class DatabaseConfigService implements TypeOrmOptionsFactory {
         TherapistSchedules,
         TherapistSchedulesDayOff,
         Orders,
+        UserDocumentation,
       ],
     };
   }

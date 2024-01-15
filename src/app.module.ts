@@ -6,6 +6,7 @@ import { TherapistSchedulesModule } from './therapist-schedules/therapist-schedu
 import { LocationsModule } from './locations/locations.module';
 import { TherapistSchedulesDayOffModule } from './therapist-schedules-day-off/therapist-schedules-day-off.module';
 import { OrdersModule } from './orders/orders.module';
+import { UserDocumentationModule } from './user-documentation/user-documentation.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { OrdersModule } from './orders/orders.module';
     LocationsModule,
     TherapistSchedulesDayOffModule,
     OrdersModule,
+    UserDocumentationModule,
   ],
 })
 export class AppModule {}
