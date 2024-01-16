@@ -97,11 +97,20 @@ export class TherapistController {
         firstName: ILike(`${query['firstName.startWith']}%`),
       };
     }
+    if (query['firstName.contains']) {
+      where = {
+        ...where,
+        firstName: ILike(`%${query['firstName.startWith']}%`),
+      };
+    }
     if (query['lastName.eq']) {
       where = { ...where, lastName: query['lastName.eq'] };
     }
     if (query['lastName.startWith']) {
       where = { ...where, lastName: ILike(`${query['lastName.startWith']}%`) };
+    }
+    if (query['lastName.contains']) {
+      where = { ...where, lastName: ILike(`%${query['lastName.startWith']}%`) };
     }
     if (query['phone.eq']) {
       where = { ...where, phone: query['phone.eq'] };

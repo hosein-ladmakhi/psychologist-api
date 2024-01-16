@@ -11,6 +11,7 @@ import {
 import { AddTherapistSchedulesDayOffDTO } from './dtos/add-therapist-schedules-day-off.dto';
 import { TherapistSchedulesDayOff } from './therapist-schedules-day-off.entity';
 import { TherapistSchedules } from 'src/therapist-schedules/therapist-schedules.entity';
+import { Therapist } from 'src/users/therapist/therapist.entity';
 
 @Controller('therapist-schedules-day-off')
 export class TherapistSchedulesDayOffController {
@@ -36,21 +37,18 @@ export class TherapistSchedulesDayOffController {
 
   @Get('/therapists')
   async getTherapistsDayOff() {
-    const daysoff = await TherapistSchedulesDayOff.find({
-      relations: { schedule: { therapist: true } },
-    });
+    const therapists = await Therapist.find();
+    const results: any[] = [];
 
-    return daysoff.reduce((acc: any, item: TherapistSchedulesDayOff) => {
-      const index = acc.findIndex(
-        (element) => element.user.id === item.schedule.therapist.id,
-      );
-      if (index > -1) {
-        acc[index]?.items?.push(item);
-        return acc;
-      }
-      acc.push({ user: item.schedule.therapist, items: [item] });
-      return acc;
-    }, []);
+    for (let i = 0; i < therapists.length; i++) {
+      const therapist = therapists[i];
+      const daysoff = await TherapistSchedulesDayOff.find({
+        relations: { schedule: { therapist: true } },
+        where: { schedule: { therapist: { id: therapist.id } } },
+      });
+      results.push({ user: therapist, items: daysoff });
+    }
+    return results;
   }
 
   @Delete(':id')
