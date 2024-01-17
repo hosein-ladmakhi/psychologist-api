@@ -71,6 +71,7 @@ export class PatientController {
       skip: page,
       take: limit,
       where,
+      relations: { orders: true },
     });
     const count = await Patient.count({
       where,
