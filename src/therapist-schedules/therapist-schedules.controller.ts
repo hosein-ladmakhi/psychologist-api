@@ -47,6 +47,78 @@ export class TherapistSchedulesController {
     );
   }
 
+  @Get('/therapist/per-day/:id')
+  async getTherapistSchedulesPerDay(@Param('id', ParseIntPipe) id: number) {
+    const datas = await TherapistSchedules.find({
+      where: { therapist: { id } },
+    });
+    const days = [
+      {
+        day: 1,
+        items: [],
+      },
+      {
+        day: 2,
+        items: [],
+      },
+      {
+        day: 3,
+        items: [],
+      },
+      {
+        day: 4,
+        items: [],
+      },
+      {
+        day: 5,
+        items: [],
+      },
+      {
+        day: 6,
+        items: [],
+      },
+      {
+        day: 7,
+        items: [],
+      },
+    ];
+
+    return days.map((daysItem) => {
+      const items = datas.filter((element) => element.day === daysItem.day);
+      return { ...daysItem, items };
+    });
+  }
+
+  @Get('/therapist/:id/day/:day')
+  async getTherapistSchedulesBasedOnTherapistAndDay(
+    @Query() query = {},
+    @Param('id', ParseIntPipe) id: number,
+    @Param('day', ParseIntPipe) day: number,
+  ) {
+    let where: Record<any, any> = {
+      therapist: { id },
+      day,
+    };
+    const limit = +(query['limit'] || 10);
+    const page = +(query['page'] || 0) * limit;
+    const content = await TherapistSchedules.find({
+      order: { id: -1 },
+      skip: page,
+      take: limit,
+      where,
+      relations: {
+        location: true,
+        therapist: true,
+      },
+    });
+
+    const count = await TherapistSchedules.count({
+      where,
+    });
+
+    return { content, count };
+  }
+
   @Get('/therapist/:id')
   async getTherapistSchedules(
     @Query() query = {},

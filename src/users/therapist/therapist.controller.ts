@@ -164,4 +164,9 @@ export class TherapistController {
     }
     return therapist.save();
   }
+
+  @Get(':id')
+  getTherapistById(@Param('id', ParseIntPipe) id: number) {
+    return Therapist.findOne({ where: { id } });
+  }
 }
