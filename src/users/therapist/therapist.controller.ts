@@ -40,7 +40,7 @@ export class TherapistController {
           .write(path.join(__dirname, '..', '..', '..', filePath));
       })
       .then(() => {
-        return filePath;
+        return {filePath};
       })
       .catch(() => {
         return '';
