@@ -86,9 +86,10 @@ export class OrdersController {
   }
 
   @Get('page')
-  async getOrdersPage(@Query() query = {}) {
+  async getOrdersPage(@Query() query: any = {}) {
+    console.log(query);
     let where: Record<any, any> = {};
-
+    if (query.status) where['status'] = query.status;
     const limit = +(query['limit'] || 10);
     const page = +(query['page'] || 0) * limit;
     const content = await Orders.find({
