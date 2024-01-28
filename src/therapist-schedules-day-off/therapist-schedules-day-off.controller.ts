@@ -7,6 +7,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Query,
 } from '@nestjs/common';
 import { AddTherapistSchedulesDayOffDTO } from './dtos/add-therapist-schedules-day-off.dto';
 import { TherapistSchedulesDayOff } from './therapist-schedules-day-off.entity';
@@ -49,6 +50,29 @@ export class TherapistSchedulesDayOffController {
       results.push({ user: therapist, items: daysoff });
     }
     return results;
+  }
+
+  @Get('/therapists/:id')
+  async getTherapistsDayOffBaseOnTherapistId(
+    @Param('id', ParseIntPipe) id: number,
+    @Query() query: any = {},
+  ) {
+    const limit = +(query['limit'] || 10);
+    const page = +(query['page'] || 0) * limit;
+
+    const daysOff = await TherapistSchedulesDayOff.find({
+      where: { schedule: { therapist: { id } } },
+      relations: { schedule: { therapist: true, location: true } },
+      order: { id: -1 },
+      skip: page,
+      take: limit,
+    });
+
+    const daysOffCount = await TherapistSchedulesDayOff.count({
+      where: { schedule: { therapist: { id } } },
+    });
+
+    return { content: daysOff, count: daysOffCount };
   }
 
   @Delete(':id')
