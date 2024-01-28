@@ -23,4 +23,7 @@ export class Patient extends BaseEntity {
 
   @OneToMany(() => Orders, (orders) => orders.patient)
   orders: Orders[];
+
+  @Column({ name: 'password', default: '' })
+  password: string;
 }

@@ -7,6 +7,7 @@ import { LocationsModule } from './locations/locations.module';
 import { TherapistSchedulesDayOffModule } from './therapist-schedules-day-off/therapist-schedules-day-off.module';
 import { OrdersModule } from './orders/orders.module';
 import { UserDocumentationModule } from './user-documentation/user-documentation.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { UserDocumentationModule } from './user-documentation/user-documentation
     TherapistSchedulesDayOffModule,
     OrdersModule,
     UserDocumentationModule,
+    AuthModule,
   ],
 })
 export class AppModule {}

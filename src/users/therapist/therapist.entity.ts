@@ -22,6 +22,7 @@ export enum DegtreeOfEducation {
 export enum Gender {
   male = 'male',
   female = 'female',
+  unknown = 'unknown',
 }
 
 @Entity()
@@ -68,4 +69,7 @@ export class Therapist extends BaseEntity {
 
   @OneToMany(() => Orders, (order) => order.therapist)
   patientsOrders: Orders[];
+
+  @Column({ name: 'password', default: '' })
+  password: string;
 }
