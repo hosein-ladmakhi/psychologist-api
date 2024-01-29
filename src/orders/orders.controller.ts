@@ -122,4 +122,30 @@ export class OrdersController {
     order.status = body.status;
     return order.save();
   }
+
+  @Get('own/page')
+  async getOwnOrder(@Query() query: any) {
+    const therapist = await Therapist.findOne({ where: {} });
+    let where: Record<any, any> = {
+      therapist: { id: therapist.id },
+    };
+    if (query.status) where['status'] = query.status;
+    const limit = +(query['limit'] || 10);
+    const page = +(query['page'] || 0) * limit;
+    const content = await Orders.find({
+      order: { id: -1 },
+      skip: page,
+      take: limit,
+      where,
+      relations: {
+        therapist: true,
+        patient: true,
+        documentation: true,
+      },
+    });
+    const count = await Orders.count({
+      where,
+    });
+    return { content, count };
+  }
 }
