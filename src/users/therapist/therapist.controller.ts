@@ -11,6 +11,7 @@ import {
   Post,
   Query,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -22,6 +23,8 @@ import { Therapist } from './therapist.entity';
 import { ILike, In, Like } from 'typeorm';
 import { Categories } from 'src/categories/categories.entity';
 import { EditTherapistDTO } from './dtos/edit-therapist.dto';
+import { CurrentUser } from 'src/auth/current-user.decorator';
+import { TokenGuard } from 'src/auth/token.guard';
 
 @Controller('therapist')
 export class TherapistController {
@@ -40,7 +43,7 @@ export class TherapistController {
           .write(path.join(__dirname, '..', '..', '..', filePath));
       })
       .then(() => {
-        return {filePath};
+        return { filePath };
       })
       .catch(() => {
         return '';
@@ -135,6 +138,15 @@ export class TherapistController {
     });
 
     return { content, count };
+  }
+
+  @UseGuards(TokenGuard)
+  @Patch('own')
+  updateOwnProfile(
+    @CurrentUser() user: Therapist,
+    @Body() body: EditTherapistDTO,
+  ) {
+    return this.updateTherapist(user.id, body);
   }
 
   @Delete(':id')

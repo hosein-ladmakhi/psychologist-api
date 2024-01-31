@@ -3,26 +3,27 @@ import {
   Body,
   ConflictException,
   Controller,
+  Get,
   Inject,
   NotFoundException,
   Param,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
-import { Categories } from 'src/categories/categories.entity';
 import { CreatePatientDTO } from 'src/users/patient/dtos/create-patient.dto';
 import { Patient } from 'src/users/patient/patient.entity';
-import { CreateTherapistDTO } from 'src/users/therapist/dtos/create-therapist.dto';
 import {
   DegtreeOfEducation,
   Gender,
   Therapist,
 } from 'src/users/therapist/therapist.entity';
-import { In } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 import { LoginDTO } from './dtos/login.dto';
+import { CurrentUser } from './current-user.decorator';
+import { TokenGuard } from './token.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -46,7 +47,10 @@ export class AuthController {
           throw new NotFoundException('therapist is not found');
         }
         return {
-          token: this.jwtService.sign({ id: therapist.id, role: 'therapist' }),
+          token: this.jwtService.sign({
+            userId: therapist.id,
+            role: 'therapist',
+          }),
         };
       }
       case 'admin': {
@@ -68,7 +72,7 @@ export class AuthController {
           throw new NotFoundException('patient is not found');
         }
         return {
-          token: this.jwtService.sign({ id: patient.id, role: 'patient' }),
+          token: this.jwtService.sign({ userId: patient.id, role: 'patient' }),
         };
       }
     }
@@ -110,7 +114,10 @@ export class AuthController {
         );
 
         return {
-          token: this.jwtService.sign({ id: therapist.id, role: 'therapist' }),
+          token: this.jwtService.sign({
+            userId: therapist.id,
+            role: 'therapist',
+          }),
         };
       }
       case 'admin': {
@@ -141,9 +148,18 @@ export class AuthController {
           }),
         );
         return {
-          token: this.jwtService.sign({ id: newPatient.id, role: 'patient' }),
+          token: this.jwtService.sign({
+            userId: newPatient.id,
+            role: 'patient',
+          }),
         };
       }
     }
+  }
+
+  @UseGuards(TokenGuard)
+  @Get('profile')
+  getProfile(@CurrentUser() user) {
+    return user;
   }
 }
