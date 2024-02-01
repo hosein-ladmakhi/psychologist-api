@@ -8,12 +8,16 @@ import {
   ParseIntPipe,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { AddTherapistSchedulesDayOffDTO } from './dtos/add-therapist-schedules-day-off.dto';
 import { TherapistSchedulesDayOff } from './therapist-schedules-day-off.entity';
 import { TherapistSchedules } from 'src/therapist-schedules/therapist-schedules.entity';
 import { Therapist } from 'src/users/therapist/therapist.entity';
+import { TokenGuard } from 'src/auth/token.guard';
+import { CurrentUser } from 'src/auth/current-user.decorator';
 
+@UseGuards(TokenGuard)
 @Controller('therapist-schedules-day-off')
 export class TherapistSchedulesDayOffController {
   @Post()
@@ -50,6 +54,16 @@ export class TherapistSchedulesDayOffController {
       results.push({ user: therapist, items: daysoff });
     }
     return results;
+  }
+
+  @Get('/therapists/own')
+  async getTherapistsDayOffBaseOnOwn(@CurrentUser() user: Therapist) {
+    const daysOff = await TherapistSchedulesDayOff.find({
+      where: { schedule: { therapist: { id: user.id } } },
+      relations: { schedule: { location: true } },
+      order: { id: -1 },
+    });
+    return daysOff;
   }
 
   @Get('/therapists/:id')

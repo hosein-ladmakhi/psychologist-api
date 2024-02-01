@@ -26,6 +26,7 @@ import { EditTherapistDTO } from './dtos/edit-therapist.dto';
 import { CurrentUser } from 'src/auth/current-user.decorator';
 import { TokenGuard } from 'src/auth/token.guard';
 
+@UseGuards(TokenGuard)
 @Controller('therapist')
 export class TherapistController {
   @Post('/profile')
@@ -140,7 +141,6 @@ export class TherapistController {
     return { content, count };
   }
 
-  @UseGuards(TokenGuard)
   @Patch('own')
   updateOwnProfile(
     @CurrentUser() user: Therapist,

@@ -8,12 +8,16 @@ import {
   ParseIntPipe,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { AddTherapistSchedulesDTO } from './dtos/add-therapist-schedules.dto';
 import { TherapistSchedules } from './therapist-schedules.entity';
 import { Therapist } from 'src/users/therapist/therapist.entity';
 import { Locations } from 'src/locations/locations.entity';
+import { CurrentUser } from 'src/auth/current-user.decorator';
+import { TokenGuard } from 'src/auth/token.guard';
 
+@UseGuards(TokenGuard)
 @Controller('therapist-schedules')
 export class TherapistSchedulesController {
   @Post()
@@ -117,6 +121,22 @@ export class TherapistSchedulesController {
     });
 
     return { content, count };
+  }
+
+  @Get('/therapist/own')
+  async getTherapistSchedulesByOwn(@CurrentUser() user: Therapist) {
+    let where: Record<any, any> = {
+      therapist: { id: user.id },
+    };
+    const content = await TherapistSchedules.find({
+      order: { id: -1 },
+      where,
+      relations: {
+        location: true,
+      },
+    });
+
+    return content;
   }
 
   @Get('/therapist/:id')

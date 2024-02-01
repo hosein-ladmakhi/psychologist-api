@@ -10,10 +10,13 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { CreateCategoryDTO } from './dtos/create-category.dto';
 import { Categories } from './categories.entity';
+import { TokenGuard } from 'src/auth/token.guard';
 
+@UseGuards(TokenGuard)
 @Controller('categories')
 export class CategoriesController {
   @Post()
