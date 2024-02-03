@@ -124,10 +124,20 @@ export class TherapistSchedulesController {
   }
 
   @Get('/therapist/own')
-  async getTherapistSchedulesByOwn(@CurrentUser() user: Therapist) {
+  async getTherapistSchedulesByOwn(
+    @CurrentUser() user: Therapist,
+    @Query() query: any = {},
+  ) {
+    console.log(123, query);
     let where: Record<any, any> = {
       therapist: { id: user.id },
     };
+    if (query['day']) where['day'] = query['day'];
+    if (query['location']) where['location'] = { id: query['location'] };
+    if (query['room']) where['room'] = query['room'];
+    if (query['type']) where['type'] = query['type'];
+    if (query['startHour']) where['startHour'] = query['startHour'];
+    if (query['endHour']) where['endHour'] = query['endHour'];
     const content = await TherapistSchedules.find({
       order: { id: -1 },
       where,

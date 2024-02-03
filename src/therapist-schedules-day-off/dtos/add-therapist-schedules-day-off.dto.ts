@@ -5,5 +5,5 @@ export class AddTherapistSchedulesDayOffDTO {
   schedule: number;
 
   @IsNotEmpty()
-  date: Date;
+  date: string;
 }

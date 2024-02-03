@@ -16,6 +16,8 @@ import { TherapistSchedules } from 'src/therapist-schedules/therapist-schedules.
 import { Therapist } from 'src/users/therapist/therapist.entity';
 import { TokenGuard } from 'src/auth/token.guard';
 import { CurrentUser } from 'src/auth/current-user.decorator';
+import * as moment from 'moment';
+import { Equal } from 'typeorm';
 
 @UseGuards(TokenGuard)
 @Controller('therapist-schedules-day-off')
@@ -57,9 +59,21 @@ export class TherapistSchedulesDayOffController {
   }
 
   @Get('/therapists/own')
-  async getTherapistsDayOffBaseOnOwn(@CurrentUser() user: Therapist) {
+  async getTherapistsDayOffBaseOnOwn(
+    @CurrentUser() user: Therapist,
+    @Query() query = {},
+  ) {
+    let where: any = {
+      schedule: { therapist: { id: user.id } },
+    };
+    if (query['day']) {
+      where.schedule = { ...where.schedule, day: +query['day'] };
+    }
+    if (query['date']) {
+      where.date = query['date'];
+    }
     const daysOff = await TherapistSchedulesDayOff.find({
-      where: { schedule: { therapist: { id: user.id } } },
+      where,
       relations: { schedule: { location: true } },
       order: { id: -1 },
     });

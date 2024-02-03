@@ -21,6 +21,6 @@ export class TherapistSchedulesDayOff extends BaseEntity {
   @JoinColumn()
   schedule: TherapistSchedules;
 
-  @Column({ name: 'date' })
-  date: Date;
+  @Column({ name: 'date', default: '' })
+  date: string;
 }

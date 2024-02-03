@@ -14,7 +14,7 @@ import { Therapist } from 'src/users/therapist/therapist.entity';
 import { Patient } from 'src/users/patient/patient.entity';
 import { Locations } from 'src/locations/locations.entity';
 import { Categories } from 'src/categories/categories.entity';
-import { In } from 'typeorm';
+import { ILike, In } from 'typeorm';
 import { Orders } from './orders.entity';
 import { MultipleSaveOrderDto } from './dtos/multiple-save-order.dto';
 import * as moment from 'moment';
@@ -131,6 +131,15 @@ export class OrdersController {
       therapist: { id: therapist.id },
     };
     if (query.status) where['status'] = query.status;
+    if (query.day) where['day'] = +query.day;
+    if (query.date) where['date'] = query.date;
+    if (query.location) where['address'] = ILike(`%${query.location}%`);
+    if (query.patient) where['patient'] = { id: +query.patient };
+    if (query.category) where['categories'] = ILike(`%${query.category}%`); //Must Repair In Future
+    if (query.type) where['type'] = query.type;
+    if (query.status) where['status'] = query.status;
+    if (query.startHour) where['startHour'] = query.startHour;
+    if (query.endHour) where['endHour'] = query.endHour;
     const content = await Orders.find({
       order: { id: -1 },
       where,
