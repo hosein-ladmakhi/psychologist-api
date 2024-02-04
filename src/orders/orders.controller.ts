@@ -18,6 +18,7 @@ import { ILike, In } from 'typeorm';
 import { Orders } from './orders.entity';
 import { MultipleSaveOrderDto } from './dtos/multiple-save-order.dto';
 import * as moment from 'moment';
+import { TherapistSchedulesDayOff } from 'src/therapist-schedules-day-off/therapist-schedules-day-off.entity';
 
 @Controller('orders')
 export class OrdersController {
@@ -84,6 +85,45 @@ export class OrdersController {
   @Get()
   getOrders() {
     return Orders.find();
+  }
+
+  @Get('reservation-date/:day/:therapistId/:time')
+  async getReservationDateBasedOnDayAndTherapist(
+    @Param('day', ParseIntPipe) day: number,
+    @Param('therapistId', ParseIntPipe) therapistId: number,
+    @Param('time') time: string,
+  ) {
+    const [startHour, endHour] = time.split('_');
+    const therapist = await Therapist.findOne({
+      where: { id: therapistId },
+      relations: { schedules: true },
+    });
+    if (!therapist) {
+      throw new NotFoundException('therapist is not found');
+    }
+    const dates = [];
+    for (let i = 0; i < 10; i++) {
+      const date = moment().weekday(day).add(i, 'week').format('YYYY-MM-DD');
+      const orders = await Orders.find({
+        where: {
+          therapist: { id: therapistId },
+          date: date as any,
+          day,
+          startHour,
+          endHour,
+        },
+      });
+      const offDay = await TherapistSchedulesDayOff.find({
+        where: {
+          schedule: { therapist: { id: therapistId }, day, startHour, endHour },
+          date,
+        },
+      });
+      if (!orders.length && !offDay.length) {
+        dates.push(date);
+      }
+    }
+    return { dates };
   }
 
   @Get('page')

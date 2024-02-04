@@ -200,6 +200,9 @@ export class TherapistSchedulesController {
     return content;
   }
 
+  @Get('/therapist/reserve/:id')
+  getTherapistScheduleForOrder() {}
+
   @Get('/therapist/:id')
   async getTherapistSchedules(
     @Query() query = {},

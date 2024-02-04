@@ -27,7 +27,7 @@ export class SaveOrderDto {
   location: number;
 
   @IsNotEmpty()
-  date: Date;
+  date: string;
 
   @IsNotEmpty()
   @IsNumber()

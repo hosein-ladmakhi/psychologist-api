@@ -48,7 +48,7 @@ export class Orders extends BaseEntity {
   address: string;
 
   @Column({ name: 'date' })
-  date: Date;
+  date: string;
 
   @Column({ name: 'room' })
   room: number;
