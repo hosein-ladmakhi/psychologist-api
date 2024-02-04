@@ -42,6 +42,27 @@ export class TherapistSchedulesDayOffController {
     );
   }
 
+  @Post('own')
+  async createOwnSchedulesDayOff(
+    @Body() body: AddTherapistSchedulesDayOffDTO,
+    @CurrentUser() user: Therapist,
+  ) {
+    const schedule = await TherapistSchedules.findOne({
+      where: { id: body.schedule, therapist: { id: user.id } },
+    });
+
+    if (!schedule) {
+      throw new NotFoundException('schedule not defined');
+    }
+
+    return TherapistSchedulesDayOff.save(
+      TherapistSchedulesDayOff.create({
+        schedule,
+        date: body.date,
+      }),
+    );
+  }
+
   @Get('/therapists')
   async getTherapistsDayOff() {
     const therapists = await Therapist.find();

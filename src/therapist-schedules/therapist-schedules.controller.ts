@@ -16,6 +16,7 @@ import { Therapist } from 'src/users/therapist/therapist.entity';
 import { Locations } from 'src/locations/locations.entity';
 import { CurrentUser } from 'src/auth/current-user.decorator';
 import { TokenGuard } from 'src/auth/token.guard';
+import { AddOwnSchedulesDTO } from './dtos/add-own-schedule.dto';
 
 @UseGuards(TokenGuard)
 @Controller('therapist-schedules')
@@ -49,6 +50,56 @@ export class TherapistSchedulesController {
         room: body.room,
       }),
     );
+  }
+  @Post('own')
+  async createOwnSchedules(
+    @Body() body: AddOwnSchedulesDTO,
+    @CurrentUser() user: Therapist,
+  ) {
+    const therapist = await Therapist.findOne({
+      where: { id: user.id },
+    });
+
+    if (!therapist) {
+      throw new NotFoundException('therapist is not defined');
+    }
+
+    const location = await Locations.findOne({
+      where: { id: body.location },
+    });
+
+    if (!location) {
+      throw new NotFoundException('location is not defined');
+    }
+
+    return TherapistSchedules.save(
+      TherapistSchedules.create({
+        day: body.day,
+        endHour: body.endTime,
+        location,
+        therapist,
+        type: body.type,
+        startHour: body.startTime,
+        room: body.room,
+      }),
+    );
+  }
+
+  @Get('filtered-data')
+  async getOwnScheduleFilteredData(@CurrentUser() user: Therapist) {
+    const content = await TherapistSchedules.find({
+      order: { id: -1 },
+      where: { therapist: { id: user.id } },
+      relations: {
+        location: true,
+      },
+    });
+
+    return {
+      locations: content.map((c) => c.location),
+      times: content.map((t) => `${t.startHour}_${t.endHour}`),
+      rooms: content.map((c) => c.room),
+    };
   }
 
   @Get('/therapist/per-day/:id')
