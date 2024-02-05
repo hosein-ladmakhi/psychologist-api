@@ -7,6 +7,7 @@ import {
   Inject,
   NotFoundException,
   Param,
+  Patch,
   Post,
   UseGuards,
 } from '@nestjs/common';
@@ -24,10 +25,30 @@ import * as bcrypt from 'bcryptjs';
 import { LoginDTO } from './dtos/login.dto';
 import { CurrentUser } from './current-user.decorator';
 import { TokenGuard } from './token.guard';
+import { UpdatePasswordDTO } from './dtos/update-password.dto';
 
 @Controller('auth')
 export class AuthController {
   @Inject(JwtService) private readonly jwtService: JwtService;
+
+  @UseGuards(TokenGuard)
+  @Patch('/patient/password')
+  async changePatientPassword(
+    @Body() body: UpdatePasswordDTO,
+    @CurrentUser() user: Patient,
+  ) {
+    const updatedUser = await Patient.findOne({ where: { id: user.id } });
+    const isSamePassword = await bcrypt.compare(
+      body.currentPassword,
+      updatedUser.password,
+    );
+    if (updatedUser.password && !isSamePassword) {
+      return { message: 'Invalid Password', success: false };
+    }
+    updatedUser.password = await bcrypt.hash(body.password, 8);
+    await updatedUser.save();
+    return { success: true };
+  }
 
   @Post('login/:type')
   async login(@Param('type') type: string, @Body() body: LoginDTO) {

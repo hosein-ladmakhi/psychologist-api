@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { SaveOrderDto } from './dtos/save-order.dto';
 import { Therapist } from 'src/users/therapist/therapist.entity';
@@ -19,6 +20,8 @@ import { Orders } from './orders.entity';
 import { MultipleSaveOrderDto } from './dtos/multiple-save-order.dto';
 import * as moment from 'moment';
 import { TherapistSchedulesDayOff } from 'src/therapist-schedules-day-off/therapist-schedules-day-off.entity';
+import { CurrentUser } from 'src/auth/current-user.decorator';
+import { TokenGuard } from 'src/auth/token.guard';
 
 @Controller('orders')
 export class OrdersController {
@@ -164,11 +167,38 @@ export class OrdersController {
     return order.save();
   }
 
-  @Get('own')
-  async getOwnOrder(@Query() query: any) {
-    const therapist = await Therapist.findOne({ where: {} });
+  @UseGuards(TokenGuard)
+  @Get('patient/own')
+  async getOwnPatientOrder(@Query() query: any, @CurrentUser() user: Patient) {
     let where: Record<any, any> = {
-      therapist: { id: therapist.id },
+      patient: { id: user.id },
+    };
+    if (query.status) where['status'] = query.status;
+    if (query.day) where['day'] = +query.day;
+    if (query.date) where['date'] = query.date;
+    if (query.location) where['address'] = ILike(`%${query.location}%`);
+    if (query.patient) where['patient'] = { id: +query.patient };
+    if (query.category) where['categories'] = ILike(`%${query.category}%`); //Must Repair In Future
+    if (query.type) where['type'] = query.type;
+    if (query.status) where['status'] = query.status;
+    if (query.startHour) where['startHour'] = query.startHour;
+    if (query.endHour) where['endHour'] = query.endHour;
+    const content = await Orders.find({
+      order: { id: -1 },
+      where,
+      relations: {
+        therapist: true,
+        patient: true,
+        documentation: true,
+      },
+    });
+    return content;
+  }
+  @UseGuards(TokenGuard)
+  @Get('own')
+  async getOwnOrder(@Query() query: any, @CurrentUser() user: Therapist) {
+    let where: Record<any, any> = {
+      therapist: { id: user.id },
     };
     if (query.status) where['status'] = query.status;
     if (query.day) where['day'] = +query.day;

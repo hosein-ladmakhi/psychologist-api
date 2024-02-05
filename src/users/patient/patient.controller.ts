@@ -10,11 +10,14 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { Patient } from './patient.entity';
 import { CreatePatientDTO } from './dtos/create-patient.dto';
 import { EditPatientDTO } from './dtos/edit-patient.dto';
 import { ILike, Like } from 'typeorm';
+import { CurrentUser } from 'src/auth/current-user.decorator';
+import { TokenGuard } from 'src/auth/token.guard';
 
 @Controller('patient')
 export class PatientController {
@@ -78,6 +81,20 @@ export class PatientController {
     });
 
     return { content, count };
+  }
+
+  @UseGuards(TokenGuard)
+  @Patch('profile')
+  async updateOwnProfile(
+    @CurrentUser() user: Patient,
+    @Body() body: EditPatientDTO,
+  ) {
+    const patient = await Patient.findOne({ where: { id: user.id } });
+    if (!patient) {
+      throw new NotFoundException('patient is not defined');
+    }
+    Object.keys(body).map((b) => (patient[b] = body[b]));
+    return patient.save();
   }
 
   @Patch(':id')
