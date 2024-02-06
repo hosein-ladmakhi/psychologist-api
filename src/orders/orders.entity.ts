@@ -1,3 +1,4 @@
+import { now } from 'moment';
 import { Categories } from 'src/categories/categories.entity';
 import { jsonTransformer } from 'src/core/utils/json-transformer';
 import { TherapistScheduleType } from 'src/therapist-schedules/therapist-schedules.entity';
@@ -47,7 +48,7 @@ export class Orders extends BaseEntity {
   @Column({ name: 'address' })
   address: string;
 
-  @Column({ name: 'date' })
+  @Column({ name: 'date', default: now() })
   date: string;
 
   @Column({ name: 'room' })

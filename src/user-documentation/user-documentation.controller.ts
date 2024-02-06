@@ -41,6 +41,6 @@ export class UserDocumentationController {
         }),
       );
     }
-return {}
- }
+    return {};
+  }
 }

@@ -8,6 +8,7 @@ import { TherapistSchedulesDayOffModule } from './therapist-schedules-day-off/th
 import { OrdersModule } from './orders/orders.module';
 import { UserDocumentationModule } from './user-documentation/user-documentation.module';
 import { AuthModule } from './auth/auth.module';
+import { TicketsModule } from './tickets/tickets.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { AuthModule } from './auth/auth.module';
     OrdersModule,
     UserDocumentationModule,
     AuthModule,
+    TicketsModule,
   ],
 })
 export class AppModule {}
