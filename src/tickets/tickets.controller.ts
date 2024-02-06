@@ -72,7 +72,7 @@ export class TicketsController {
       take: limit,
       where,
       relations: {
-        childrens: true,
+        childrens: { parent: true },
       },
     });
     const count = await Tickets.count({

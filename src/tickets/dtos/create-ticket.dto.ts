@@ -10,6 +10,5 @@ export class CreateTicketDTO {
   title: string;
 
   @IsOptional()
-  @IsNumber()
   parent?: number;
 }
