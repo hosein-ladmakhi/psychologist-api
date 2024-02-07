@@ -33,6 +33,12 @@ export class Tickets extends BaseEntity {
   })
   attachments: string[] = [];
 
+  @Column({ name: 'answer', default: null })
+  answer?: string;
+
+  @Column({ name: 'answer_at', default: null })
+  answerAt?: Date;
+
   @Column({ name: 'status', default: TicketStatus.Open })
   status: TicketStatus;
 

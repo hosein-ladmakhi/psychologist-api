@@ -6,6 +6,7 @@ import {
   NotFoundException,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   Query,
   UploadedFiles,
@@ -16,12 +17,13 @@ import { TokenGuard } from 'src/auth/token.guard';
 import { CreateTicketDTO } from './dtos/create-ticket.dto';
 import { CurrentUser } from 'src/auth/current-user.decorator';
 import { Patient } from 'src/users/patient/patient.entity';
-import { Tickets } from './tickets.entity';
+import { TicketStatus, Tickets } from './tickets.entity';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { FileDTO } from 'src/core/dtos/FileDTO';
 import * as path from 'path';
-import { writeFileSync } from 'fs';
+import { readFileSync, writeFileSync } from 'fs';
 import { ILike, IsNull } from 'typeorm';
+import * as AdmZip from 'adm-zip';
 
 @UseGuards(TokenGuard)
 @Controller('tickets')
@@ -106,17 +108,79 @@ export class TicketsController {
     return { content, count };
   }
 
-  @Delete(':id')
-  async deleteTicket(
+  @Delete('own/:id')
+  async deleteOwnTicket(
     @Param('id', ParseIntPipe) id: number,
     @CurrentUser() user: Patient,
   ) {
     const ticket = await Tickets.findOne({
       where: { id, patient: { id: user.id } },
+      relations: { childrens: true },
     });
     if (!ticket) {
       throw new NotFoundException('tickets is not defined');
     }
+    await Tickets.remove(ticket.childrens);
     return ticket.remove();
+  }
+
+  @Post('answer/:id')
+  async answerTicket(@Param('id', ParseIntPipe) id: number, @Body() body: any) {
+    const ticket = await Tickets.findOne({
+      where: { id },
+      relations: { childrens: true },
+    });
+    if (!ticket) {
+      throw new NotFoundException('tickets is not defined');
+    }
+    ticket.answer = body.answer;
+    ticket.answerAt = new Date();
+    ticket.status = TicketStatus.Close;
+    ticket.closeAt = new Date();
+    await ticket.save();
+    return ticket;
+  }
+
+  @Get('download/attachment/:id')
+  async downloadAttachment(@Param('id', ParseIntPipe) id: number) {
+    const ticket = await Tickets.findOne({
+      where: { id },
+      relations: { childrens: true },
+    });
+    if (!ticket) {
+      throw new NotFoundException('tickets is not defined');
+    }
+
+    const zipFile = new AdmZip();
+    for (let i = 0; i < ticket.attachments.length; i++) {
+      const fileName = ticket.attachments[i];
+      zipFile.addLocalFile(
+        path.join(__dirname, '..', '..', 'upload', fileName),
+      );
+    }
+    return zipFile.toBuffer();
+  }
+
+  @Delete(':id')
+  async deleteTicket(@Param('id', ParseIntPipe) id: number) {
+    const ticket = await Tickets.findOne({
+      where: { id },
+      relations: { childrens: true },
+    });
+    if (!ticket) {
+      throw new NotFoundException('tickets is not defined');
+    }
+    await Tickets.remove(ticket.childrens);
+    return ticket.remove();
+  }
+
+  @Patch(':id')
+  async updateTicket(@Param('id', ParseIntPipe) id: number, @Body() body: any) {
+    const ticket = await Tickets.findOne({ where: { id } });
+    if (!ticket) {
+      throw new NotFoundException('ticket is not found');
+    }
+    Object.keys(body).map((b) => (ticket[b] = body[b]));
+    return ticket.save();
   }
 }
