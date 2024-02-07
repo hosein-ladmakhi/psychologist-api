@@ -21,7 +21,7 @@ import { FilesInterceptor } from '@nestjs/platform-express';
 import { FileDTO } from 'src/core/dtos/FileDTO';
 import * as path from 'path';
 import { writeFileSync } from 'fs';
-import { IsNull } from 'typeorm';
+import { ILike, IsNull } from 'typeorm';
 
 @UseGuards(TokenGuard)
 @Controller('tickets')
@@ -55,6 +55,31 @@ export class TicketsController {
       data.parent = await Tickets.findOne({ where: { id: body.parent } });
     }
     return Tickets.save(Tickets.create(data as Tickets));
+  }
+
+  @Get('page')
+  async getTicketsPage(@Query() query: any = {}) {
+    let where: Record<any, any> = { parent: IsNull() };
+    const limit = +(query['limit'] || 10);
+    const page = +(query['page'] || 0) * limit;
+    if (query['title']) where['title'] = ILike(`${query['title']}%`);
+    if (query['status']) where['status'] = query['status'];
+    const content = await Tickets.find({
+      order: { id: -1 },
+      skip: page,
+      take: limit,
+      where,
+      relations: {
+        patient: true,
+        parent: true,
+        childrens: true,
+      },
+    });
+    const count = await Tickets.count({
+      where,
+    });
+
+    return { content, count };
   }
 
   @Get('own')
