@@ -20,4 +20,7 @@ export class Categories extends BaseEntity {
 
   @ManyToMany(() => Therapist, (therapist) => therapist.workingFields)
   therapists: Therapist[];
+
+  @Column({ name: 'icon', default: null })
+  icon?: string;
 }

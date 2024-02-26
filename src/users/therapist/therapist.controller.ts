@@ -26,9 +26,9 @@ import { EditTherapistDTO } from './dtos/edit-therapist.dto';
 import { CurrentUser } from 'src/auth/current-user.decorator';
 import { TokenGuard } from 'src/auth/token.guard';
 
-@UseGuards(TokenGuard)
 @Controller('therapist')
 export class TherapistController {
+  @UseGuards(TokenGuard)
   @Post('/profile')
   @UseInterceptors(FileInterceptor('image'))
   uploadProfileImage(@UploadedFile() file: FileDTO) {
@@ -51,6 +51,7 @@ export class TherapistController {
       });
   }
 
+  @UseGuards(TokenGuard)
   @Post()
   async createNewTherapist(@Body() dto: CreateTherapistDTO) {
     if (
@@ -141,6 +142,7 @@ export class TherapistController {
     return { content, count };
   }
 
+  @UseGuards(TokenGuard)
   @Patch('own')
   updateOwnProfile(
     @CurrentUser() user: Therapist,
@@ -149,6 +151,7 @@ export class TherapistController {
     return this.updateTherapist(user.id, body);
   }
 
+  @UseGuards(TokenGuard)
   @Delete(':id')
   async deleteTherapist(@Param('id', ParseIntPipe) id: number) {
     const therapist = await Therapist.findOne({ where: { id } });
@@ -160,6 +163,7 @@ export class TherapistController {
   }
 
   @Patch(':id')
+  @UseGuards(TokenGuard)
   async updateTherapist(
     @Param('id', ParseIntPipe) id: number,
     @Body() body: EditTherapistDTO,
@@ -179,6 +183,10 @@ export class TherapistController {
 
   @Get(':id')
   getTherapistById(@Param('id', ParseIntPipe) id: number) {
-    return Therapist.findOne({ where: { id } });
+    console.log('salam');
+    return Therapist.findOne({
+      where: { id },
+      relations: { workingFields: true },
+    });
   }
 }

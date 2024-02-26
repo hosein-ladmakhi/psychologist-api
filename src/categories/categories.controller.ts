@@ -10,15 +10,35 @@ import {
   Patch,
   Post,
   Query,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { CreateCategoryDTO } from './dtos/create-category.dto';
 import { Categories } from './categories.entity';
 import { TokenGuard } from 'src/auth/token.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { FileDTO } from 'src/core/dtos/FileDTO';
+import { writeFileSync } from 'fs';
+import * as path from 'path';
 
-@UseGuards(TokenGuard)
 @Controller('categories')
 export class CategoriesController {
+  @Post('upload-icon')
+  @UseInterceptors(FileInterceptor('icon'))
+  uploadIcon(@UploadedFile() file: FileDTO) {
+    const fileName = `${new Date().getTime()}-${
+      Math.floor(Math.random() * 100000) + 2000000
+    }${path.extname(file.originalname)}`;
+
+    writeFileSync(
+      path.join(__dirname, '..', '..', 'upload', fileName),
+      file.buffer,
+    );
+
+    return { fileName };
+  }
+
   @Post()
   async createCategory(@Body() dto: CreateCategoryDTO) {
     if (
@@ -33,8 +53,39 @@ export class CategoriesController {
       Categories.create({
         faName: dto.faName,
         enName: dto.enName,
+        icon: dto.icon,
       }),
     );
+  }
+
+  @Get('/therapists')
+  getCategoriesTherapist(@Query() query: any) {
+    let where = {};
+    let therapistWhere = {};
+    if (query.firstName) {
+      therapistWhere = { ...therapistWhere, firstName: query.firstName };
+    }
+    if (query.lastName) {
+      therapistWhere = { ...therapistWhere, lastName: query.lastName };
+    }
+    if (query.degreeOfEducation) {
+      therapistWhere = {
+        ...therapistWhere,
+        degreeOfEducation: query.degreeOfEducation,
+      };
+    }
+    if (query.gender) {
+      therapistWhere = { ...therapistWhere, gender: query.gender };
+    }
+
+    if (Object.keys(therapistWhere).length > 0) {
+      where = { ...where, therapists: therapistWhere };
+    }
+    return Categories.find({
+      order: { id: -1 },
+      relations: { therapists: { patientsOrders: true } },
+      where,
+    }).then((res) => res.filter((e) => e.therapists.length > 0));
   }
 
   @Get()

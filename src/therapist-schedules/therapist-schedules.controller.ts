@@ -18,9 +18,9 @@ import { CurrentUser } from 'src/auth/current-user.decorator';
 import { TokenGuard } from 'src/auth/token.guard';
 import { AddOwnSchedulesDTO } from './dtos/add-own-schedule.dto';
 
-@UseGuards(TokenGuard)
 @Controller('therapist-schedules')
 export class TherapistSchedulesController {
+  @UseGuards(TokenGuard)
   @Post()
   async createTherapistSchedules(@Body() body: AddTherapistSchedulesDTO) {
     const therapist = await Therapist.findOne({
@@ -51,6 +51,7 @@ export class TherapistSchedulesController {
       }),
     );
   }
+  @UseGuards(TokenGuard)
   @Post('own')
   async createOwnSchedules(
     @Body() body: AddOwnSchedulesDTO,
@@ -175,6 +176,7 @@ export class TherapistSchedulesController {
   }
 
   @Get('/therapist/own')
+  @UseGuards(TokenGuard)
   async getTherapistSchedulesByOwn(
     @CurrentUser() user: Therapist,
     @Query() query: any = {},
@@ -245,6 +247,7 @@ export class TherapistSchedulesController {
   }
 
   @Delete(':id')
+  @UseGuards(TokenGuard)
   async deleteSchedule(@Param('id', ParseIntPipe) id: number) {
     const schedule = await TherapistSchedules.findOne({
       where: { id },
