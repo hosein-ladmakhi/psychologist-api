@@ -72,6 +72,7 @@ export class AuthController {
             userId: therapist.id,
             role: 'therapist',
           }),
+          user: therapist,
         };
       }
       case 'admin': {
@@ -94,6 +95,7 @@ export class AuthController {
         }
         return {
           token: this.jwtService.sign({ userId: patient.id, role: 'patient' }),
+          user: patient,
         };
       }
     }
