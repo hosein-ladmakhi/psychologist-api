@@ -12,4 +12,12 @@ export class EditPatientDTO {
   @IsOptional()
   @IsString()
   phone?: string;
+
+  @IsOptional()
+  @IsString()
+  newPassword?: string;
+
+  @IsOptional()
+  @IsString()
+  currentPassword?: string;
 }

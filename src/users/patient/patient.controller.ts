@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   ConflictException,
   Controller,
@@ -18,6 +19,7 @@ import { EditPatientDTO } from './dtos/edit-patient.dto';
 import { ILike, Like } from 'typeorm';
 import { CurrentUser } from 'src/auth/current-user.decorator';
 import { TokenGuard } from 'src/auth/token.guard';
+import * as bcrypt from 'bcryptjs';
 
 @Controller('patient')
 export class PatientController {
@@ -94,6 +96,22 @@ export class PatientController {
       throw new NotFoundException('patient is not defined');
     }
     Object.keys(body).map((b) => (patient[b] = body[b]));
+    if (body.newPassword) {
+      if (!body.currentPassword) {
+        throw new BadRequestException('Invalid Current Password');
+      }
+      const isMatched = await bcrypt.compare(
+        body.currentPassword,
+        patient.password,
+      );
+
+      if (!isMatched) {
+        throw new BadRequestException('Invalid Current Password');
+      }
+
+      patient.password = await bcrypt.hash(body.newPassword, 8);
+    }
+
     return patient.save();
   }
 

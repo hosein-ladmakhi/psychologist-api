@@ -150,7 +150,6 @@ export class TicketsController {
     if (!ticket) {
       throw new NotFoundException('tickets is not defined');
     }
-
     const zipFile = new AdmZip();
     for (let i = 0; i < ticket.attachments.length; i++) {
       const fileName = ticket.attachments[i];
