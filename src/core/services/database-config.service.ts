@@ -20,6 +20,7 @@ export class DatabaseConfigService implements TypeOrmOptionsFactory {
       database: this.configService.get<string>('APP_DB_NAME'),
       password: this.configService.get<string>('APP_DB_PASSWORD'),
       username: this.configService.get<string>('APP_DB_USERNAME'),
+      host: this.configService.get<string>('APP_DB_HOST'),
       port: +this.configService.get<number>('APP_DB_PORT'),
       type: 'postgres',
       autoLoadEntities: true,
