@@ -83,7 +83,7 @@ export class CategoriesController {
     }
     return Categories.find({
       order: { id: -1 },
-      relations: { therapists: { patientsOrders: true } },
+      relations: { therapists: { patientsOrders: true, workingFields: true } },
       where,
     }).then((res) => res.filter((e) => e.therapists.length > 0));
   }
@@ -115,6 +115,7 @@ export class CategoriesController {
       skip: page,
       take: limit,
       where,
+      relations: { therapists: { workingFields: true } },
     });
     const count = await Categories.count({
       where,

@@ -10,7 +10,10 @@ const bootstrap = async () => {
   const configService = await app.get<ConfigService>(ConfigService);
   const port = await configService.get<number>('APP_PORT');
 
-  app.enableCors();
+  app.enableCors({
+    origin: '*',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  });
   app.useGlobalPipes(new ValidationPipe());
   app.use('/upload', express.static(path.join(__dirname, '..', 'upload')));
   app.listen(port, () => {
