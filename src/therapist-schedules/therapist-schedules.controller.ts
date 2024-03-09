@@ -107,7 +107,7 @@ export class TherapistSchedulesController {
   async getTherapistSchedulesPerDay(@Param('id', ParseIntPipe) id: number) {
     const datas = await TherapistSchedules.find({
       where: { therapist: { id } },
-      relations: { location: true },
+      relations: { location: true, therapist: true },
     });
     const days = [
       {
