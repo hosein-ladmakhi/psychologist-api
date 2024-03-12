@@ -186,7 +186,11 @@ export class TherapistController {
     console.log('salam');
     return Therapist.findOne({
       where: { id },
-      relations: { workingFields: true, patientsOrders: true, schedules: true },
+      relations: {
+        workingFields: true,
+        patientsOrders: { patient: true },
+        schedules: { location: true, daysOff: true },
+      },
     });
   }
 }

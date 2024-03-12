@@ -1,4 +1,5 @@
 import { Locations } from 'src/locations/locations.entity';
+import { TherapistSchedulesDayOff } from 'src/therapist-schedules-day-off/therapist-schedules-day-off.entity';
 import { Therapist } from 'src/users/therapist/therapist.entity';
 import {
   BaseEntity,
@@ -6,6 +7,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -45,4 +47,7 @@ export class TherapistSchedules extends BaseEntity {
 
   @Column({ name: 'room' })
   room: number;
+
+  @OneToMany(() => TherapistSchedulesDayOff, (element) => element.schedule)
+  daysOff: TherapistSchedulesDayOff[];
 }
