@@ -8,12 +8,13 @@ import { TherapistSchedulesDayOff } from 'src/therapist-schedules-day-off/therap
 import { TherapistSchedules } from 'src/therapist-schedules/therapist-schedules.entity';
 import { Tickets } from 'src/tickets/tickets.entity';
 import { UserDocumentation } from 'src/user-documentation/user-documentation.entity';
+import { Admin } from 'src/users/admin/admin.entity';
 import { Patient } from 'src/users/patient/patient.entity';
 import { Therapist } from 'src/users/therapist/therapist.entity';
 
 @Injectable()
 export class DatabaseConfigService implements TypeOrmOptionsFactory {
-  constructor(private readonly configService: ConfigService) {}
+  constructor(private readonly configService: ConfigService) { }
 
   createTypeOrmOptions(): TypeOrmModuleOptions {
     return {
@@ -35,6 +36,7 @@ export class DatabaseConfigService implements TypeOrmOptionsFactory {
         Orders,
         UserDocumentation,
         Tickets,
+        Admin
       ],
     };
   }

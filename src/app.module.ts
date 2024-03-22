@@ -24,4 +24,4 @@ import { TicketsModule } from './tickets/tickets.module';
     TicketsModule,
   ],
 })
-export class AppModule {}
+export class AppModule { }
