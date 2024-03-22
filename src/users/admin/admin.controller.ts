@@ -9,7 +9,7 @@ import * as bcrypt from "bcryptjs"
 @Controller('admin')
 export class AdminController {
     @Get()
-    getAdmins(@Query() query: any) {
+    async getAdmins(@Query() query: any) {
         let where: Record<any, any> = {};
         if (query['firstName.eq']) {
             where = { ...where, firstName: query['firstName.eq'] };
@@ -35,12 +35,15 @@ export class AdminController {
 
         const limit = +(query['limit'] || 10);
         const page = +(query['page'] || 0) * limit;
-        return Admin.find({
+        const content = await Admin.find({
             order: { id: -1 },
             skip: page,
             take: limit,
             where,
         })
+        const count = await Admin.count()
+
+        return { content, count }
     }
 
     @Get(':id')
