@@ -1,11 +1,13 @@
-import { Body, ConflictException, Controller, Delete, Get, NotFoundException, Param, ParseIntPipe, Patch, Post, Query } from "@nestjs/common";
+import { Body, ConflictException, Controller, Delete, Get, NotFoundException, Param, ParseIntPipe, Patch, Post, Query, UseGuards } from "@nestjs/common";
 import { Admin } from "./admin.entity";
 import { ILike, Like } from "typeorm";
 import { EditAdminDTO } from "./dtos/edit-admin.dto";
 import { CreateAdminDTO } from "./dtos/create-admin.dto";
 import * as bcrypt from "bcryptjs"
+import { TokenGuard } from "src/auth/token.guard";
 
 
+@UseGuards(TokenGuard)
 @Controller('admin')
 export class AdminController {
     @Get()
