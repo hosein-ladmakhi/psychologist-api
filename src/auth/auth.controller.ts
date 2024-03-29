@@ -7,6 +7,7 @@ import {
   Inject,
   NotFoundException,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   UseGuards,
@@ -26,6 +27,7 @@ import { LoginDTO } from './dtos/login.dto';
 import { CurrentUser } from './current-user.decorator';
 import { TokenGuard } from './token.guard';
 import { UpdatePasswordDTO } from './dtos/update-password.dto';
+import { Admin } from 'src/users/admin/admin.entity';
 
 @Controller('auth')
 export class AuthController {
@@ -48,6 +50,65 @@ export class AuthController {
     updatedUser.password = await bcrypt.hash(body.password, 8);
     await updatedUser.save();
     return { success: true };
+  }
+
+
+  @UseGuards(TokenGuard)
+  @Patch("change-password/:type/:id")
+  async changeUserPassword(@Param("type") type: string, @Param("id", ParseIntPipe) id: number, @Body() body: UpdatePasswordDTO) {
+    if (type === 'admin') {
+      try {
+        const user = await Admin.findOne({ where: { id } })
+        if (!user) {
+          throw new NotFoundException("admin is not defined")
+        }
+        const sameConfirmPassword = await bcrypt.compare(body.currentPassword, user.password);
+        if (!sameConfirmPassword) {
+          throw new NotFoundException("admin not defined with this password")
+        }
+        user.password = await bcrypt.hash(body.password, 8);
+        await user.save()
+        return true;
+      } catch (error) {
+        return false;
+      }
+    }
+    else if (type === 'therapist') {
+      try {
+        const user = await Therapist.findOne({ where: { id } })
+        if (!user) {
+          throw new NotFoundException("therapist is not defined")
+        }
+        const sameConfirmPassword = await bcrypt.compare(body.currentPassword, user.password);
+        if (!sameConfirmPassword) {
+          throw new NotFoundException("therapist not defined with this password")
+        }
+        user.password = await bcrypt.hash(body.password, 8);
+        await user.save()
+        return true;
+      } catch (error) {
+        return false;
+      }
+    }
+    else if (type === 'patient') {
+      try {
+        const user = await Patient.findOne({ where: { id } })
+        if (!user) {
+          throw new NotFoundException("patient is not defined")
+        }
+        const sameConfirmPassword = await bcrypt.compare(body.currentPassword, user.password);
+        if (!sameConfirmPassword) {
+          throw new NotFoundException("patient not defined with this password")
+        }
+        user.password = await bcrypt.hash(body.password, 8);
+        await user.save()
+        return true;
+      } catch (error) {
+        return false;
+      }
+    }
+
+    throw new BadRequestException("Type must be 'Patient' or 'Therapist' or 'Admin'")
   }
 
   @Post('login/:type')
