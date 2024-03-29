@@ -35,6 +35,10 @@ export class AdminController {
             where = { ...where, phone: Like(`${query['phone.startWith']}%`) };
         }
 
+        if (query['isActive.eq']) {
+            where = { ...where, isActive: query['isActive.eq'] }
+        }
+
         const limit = +(query['limit'] || 10);
         const page = +(query['page'] || 0) * limit;
         const content = await Admin.find({
@@ -43,7 +47,7 @@ export class AdminController {
             take: limit,
             where,
         })
-        const count = await Admin.count()
+        const count = await Admin.count({ where })
 
         return { content, count }
     }
